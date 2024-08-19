@@ -3,7 +3,7 @@ Model.objects.all() = возвращает все записи из базы д�
 Model.objects.get() = возвращает одну запись из базы даных
 Model.objects.filter() = возвращает записи из базы даных по условиям
 """
-
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
@@ -19,6 +19,7 @@ def main_page(request):
     return render(request, 'main_page.html')
 
 
+@login_required(login_url='/login/')
 def post_list_view(request):
     posts = Post.objects.all()
     return render(request, 'posts/post_list.html', {'posts': posts})
