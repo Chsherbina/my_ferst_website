@@ -3,10 +3,20 @@ Model.objects.all() = возвращает все записи из базы д�
 Model.objects.get() = возвращает одну запись из базы даных
 Model.objects.filter() = возвращает записи из базы даных по условиям
 """
+
+"""posts = [ post1, post2, post3, post4, post5, post6, post7, post8, post9, post10, post11, post12, post13, post14, post15]
+limit = 3, page = 1
+formula
+start = page-1 * limit
+(3-1)*3=6
+end = 1*3 = 3
+"""
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.db.models import Q
 
+from posts.forms import SearchForm
 from posts.models import Post
 
 
@@ -20,9 +30,32 @@ def main_page(request):
 
 
 @login_required(login_url='/login/')
-def post_list_view(request):
+def post_list_view(request, orderings=None):
+    search = request.GET.get('search')
+    tags = request.GET.getlist('tags')
+    ordering = request.GET.get('ordering')
+    searchform = SearchForm(request.GET)
+    page = int(request.GET.get('page', 1))
     posts = Post.objects.all()
-    return render(request, 'posts/post_list.html', {'posts': posts})
+    if search:
+        posts = posts.filter(Q(title__icontains=search) | Q(content__icontains=search))
+    if tags:
+        posts = posts.filter(tags__id__in=tags)
+    if orderings:
+        posts = posts.order_by(orderings)
+
+    limit = 3
+    max_pages = posts.count() / limit
+    if round(max_pages) < max_pages:
+        max_pages = round(max_pages) + 1
+    else:
+        max_pages = round(max_pages)
+
+    start = (page-1) * limit
+    end = page * limit
+    posts = posts[start:end]
+    context = {'posts': posts, 'search_form': searchform, 'max_pages': range(1, max_pages + 1)}
+    return render(request, 'posts/post_list.html', context = context)
 
 
 def post_detail_view(request, post_id):
