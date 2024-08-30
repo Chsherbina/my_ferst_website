@@ -16,8 +16,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.db.models import Q
 
-from posts.forms import SearchForm
-from posts.models import Post
+from posts.forms import SearchForm, PostUpdateForm
+from posts.models import Post, CommentForm
 
 
 def welcome(request):
@@ -60,7 +60,8 @@ def post_list_view(request, orderings=None):
 
 def post_detail_view(request, post_id):
     post = Post.objects.get(id=post_id)
-    return render(request, 'posts/post_detail.html', {'post': post})
+    comment_form = CommentForm()
+    return render(request, 'posts/post_detail.html', {'post': post, 'comment_form': comment_form})
 
 
 def post_create_view(request):
@@ -73,3 +74,18 @@ def post_create_view(request):
         rate = request.POST.get('rate')
         Post.objects.create(image=image, title=title, content=content, rate=rate)
         return redirect('/posts/')
+
+@login_required(login_url="login")
+def post_update_view(request, post_id):
+    post = Post.objects.get(id=post_id)
+    if request.method == 'GET':
+        form = PostUpdateForm(instance=post)
+        return render(request, "posts/post_update.html", {"form": form})
+    if request.method == 'POST':
+        form = PostUpdateForm(request.POST, request.FILTER, instance=post)
+        if not form.is_valid():
+            return render(request, 'posts/post_update.html', {'form': form})
+        form.save()
+        return redirect('/profile/')
+
+

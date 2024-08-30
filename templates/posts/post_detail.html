@@ -10,7 +10,12 @@
     <h5 class="card-title">{{ post.title }}</h5>
     <p class="card-text">{{ post.content }}</p>
     <p class="card-text">{{ post.rate }}</p>
-    <a href="#" class="btn btn-primary">0000</a>
+    {%if post.author == request.user%}
+    <a href="/post/{{post.id}}/update<" class="btn btn-primary">Update</a>
+    {%endif%}
   </div>
+  <form>
+    {{comment_form.as_p}}
+  </form>
 </div>
 {% endblock %}

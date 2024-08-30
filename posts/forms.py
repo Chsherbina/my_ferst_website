@@ -1,6 +1,6 @@
 from django import forms
 
-from posts.models import Tag
+from posts.models import Tag, Post
 
 
 class SearchForm(forms.Form):
@@ -29,3 +29,9 @@ class SearchForm(forms.Form):
         choices=ordering,
         widget=forms.Select(attrs={'placeholder': 'Ordering', 'class': 'form-control'})
     )
+
+
+class PostUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['title', 'content', 'tags']

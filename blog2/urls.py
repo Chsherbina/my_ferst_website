@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 from posts.views import welcome, main_page, post_list_view, post_detail_view, post_create_view
-from user.views import register_view, login_view, logout_view
+from user.views import register_view, login_view, logout_view, profile_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,4 +31,6 @@ urlpatterns = [
     path('register/', register_view),
     path('login/', login_view),
     path('logout/', logout_view),
+    path('profile/', profile_view, name='profile'),
+    path('post/<int:post_id>/update', post_detail_view, name='post-update'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
